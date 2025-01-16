@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 
-void main() => runApp(const MyApp(title: 'Audio Converter'));
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.title});
+  const MyApp({super.key});
 
-  final String title;
+  final String title = 'Audio Converter';
 
   @override
   Widget build(BuildContext context) {
@@ -34,20 +34,20 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: SelectFilesPage(title: 'Select Files'),
+      home: SelectFilesPage(pageTitle: 'Select Files'),
     );
   }
 }
 
 class SelectFilesPage extends StatelessWidget {
-  const SelectFilesPage({super.key, required this.title});
-  final String title;
+  const SelectFilesPage({super.key, required this.pageTitle});
+  final String pageTitle;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(pageTitle),
       ),
       body: SelectFilesBody(),
     );
@@ -67,7 +67,7 @@ class SelectFilesBody extends StatelessWidget {
 
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return ConversionPage(title: 'Convert Files', filePath: filePath);
+        return ConversionPage(pageTitle: 'Convert Files', filePath: filePath);
       }),
     );
   }
@@ -106,15 +106,15 @@ class SelectFilesBody extends StatelessWidget {
 }
 
 class ConversionPage extends StatelessWidget {
-  const ConversionPage({super.key, required this.title, required this.filePath});
-  final String title;
+  const ConversionPage({super.key, required this.pageTitle, required this.filePath});
+  final String pageTitle;
   final String? filePath;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(pageTitle),
       ),
       body: ConversionBody(filePath: filePath),
     );
@@ -127,8 +127,8 @@ class ConversionBody extends StatelessWidget {
   final String? filePath;
 
   void _convertFiles() {
-    FFmpegKit.execute('-i $filePath $filePath.wav').then((session) async {
-      print('$filePath >>> ... >>>');
+    FFmpegKit.execute('-i $filePath $filePath.wav').then((session) {
+      // ...
     });
   }
 
