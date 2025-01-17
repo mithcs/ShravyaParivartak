@@ -4,6 +4,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 
+import 'finished_page.dart';
+
+/// Conversion page
 class ConversionPage extends StatelessWidget {
   const ConversionPage({super.key, required this.file});
   final PlatformFile file;
@@ -19,6 +22,7 @@ class ConversionPage extends StatelessWidget {
   }
 }
 
+/// Body of conversion page
 class ConversionBody extends StatelessWidget {
   const ConversionBody({super.key, required this.file});
 
@@ -29,18 +33,29 @@ class ConversionBody extends StatelessWidget {
   int get lastDotPos => file.name.lastIndexOf('.');
   String? get outputPath => outputDir + file.name.substring(0, lastDotPos);
 
-  void _convertFiles() {
+  void _convertFiles(BuildContext context) {
+    // Execute ffmpeg command
     FFmpegKit.execute('-i $inputPath $outputPath.wav').then((session) async {
       final returnCode = await session.getReturnCode();
 
       if (ReturnCode.isSuccess(returnCode)) {
         // SUCCESS
+        // ...
       } else if (ReturnCode.isCancel(returnCode)) {
         // CANCEL
+        // ...
       } else {
         // ERROR
+        // ...
       }
     });
+
+    // Route to next page
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) {
+        return FinishedPage();
+      }),
+    );
   }
 
   @override
@@ -55,7 +70,7 @@ class ConversionBody extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
-                onPressed: _convertFiles,
+                onPressed: () => _convertFiles(context),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
                   child: Text(

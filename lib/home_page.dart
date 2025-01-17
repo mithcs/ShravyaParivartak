@@ -1,8 +1,9 @@
-import 'conversion_page.dart';
-
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
+import 'conversion_page.dart';
+
+/// Home page of the application
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -17,19 +18,30 @@ class HomePage extends StatelessWidget {
   }
 }
 
+/// Body of home page
 class HomePageBody extends StatelessWidget {
   HomePageBody({super.key});
 
   late final PlatformFile file;
 
-  void _selectFiles(BuildContext context) async {
+  // Handles file selection and routing
+  void _handleFileSelection(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
+    // Check if widget is still mounted
     if (!context.mounted) return;
 
-    if (result == null) return;
+    // When file is not selected
+    if (result == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Try Again!'),
+      ));
+      return;
+    }
+
     file = result.files.first;
 
+    // Route to next page
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
         return ConversionPage(file: file);
@@ -52,7 +64,7 @@ class HomePageBody extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: () => _selectFiles(context),
+            onPressed: () => _handleFileSelection(context),
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Text(

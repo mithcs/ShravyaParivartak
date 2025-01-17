@@ -1,9 +1,11 @@
-import 'home_page.dart';
-
 import 'package:flutter/material.dart';
 
+import 'home_page.dart';
+
+/// Entry point of app
 void main() => runApp(const MyApp());
 
+/// Main application class
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
