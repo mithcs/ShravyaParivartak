@@ -1,7 +1,7 @@
-import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:flutter/material.dart';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 
 void main() => runApp(const MyApp());
@@ -35,20 +35,19 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: SelectFilesPage(pageTitle: 'Select Files'),
+      home: SelectFilesPage(),
     );
   }
 }
 
 class SelectFilesPage extends StatelessWidget {
-  const SelectFilesPage({super.key, required this.pageTitle});
-  final String pageTitle;
+  const SelectFilesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(pageTitle),
+        title: Text('Select Files'),
       ),
       body: SelectFilesBody(),
     );
@@ -60,19 +59,17 @@ class SelectFilesBody extends StatelessWidget {
 
   late final PlatformFile file;
 
-  Future<bool> _selectFiles() async {
+  void _selectFiles(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-    if (result == null) return false;
+    if (!context.mounted) return;
+
+    if (result == null) return;
     file = result.files.first;
 
-    return true;
-  }
-
-  void _navigateToConvertPage(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return ConversionPage(pageTitle: 'Convert Files', file: file);
+        return ConversionPage( file: file);
       }),
     );
   }
@@ -92,11 +89,7 @@ class SelectFilesBody extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: () => {
-              _selectFiles()
-                .then((success) => success ? _navigateToConvertPage(context)
-                  : ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Try Again!')))),
-            },
+            onPressed: () => _selectFiles(context),
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Text(
@@ -115,15 +108,14 @@ class SelectFilesBody extends StatelessWidget {
 }
 
 class ConversionPage extends StatelessWidget {
-  const ConversionPage({super.key, required this.pageTitle, required this.file});
-  final String pageTitle;
+  const ConversionPage({super.key, required this.file});
   final PlatformFile file;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(pageTitle),
+        title: Text('Convert Files'),
       ),
       body: ConversionBody(file: file),
     );
@@ -137,7 +129,8 @@ class ConversionBody extends StatelessWidget {
   final String outputDir = '/sdcard/Download/';
 
   String? get inputPath => file.path;
-  String? get outputPath => outputDir + file.name;
+  int get lastDotPos => file.name.lastIndexOf('.');
+  String? get outputPath => outputDir + file.name.substring(0, lastDotPos);
 
   void _convertFiles() {
     FFmpegKit.execute('-i $inputPath $outputPath.wav').then((session) async {
