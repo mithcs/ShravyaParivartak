@@ -7,6 +7,9 @@ import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'finished_page.dart';
 import 'utils.dart';
 
+String format = 'mp3';
+bool preserveMetadata = false;
+
 /// Conversion page
 class ConversionPage extends StatelessWidget {
   const ConversionPage({super.key, required this.file});
@@ -16,7 +19,7 @@ class ConversionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Convert Files'),
+        title: const Text('Convert Files'),
       ),
       body: ConversionBody(file: file),
     );
@@ -33,13 +36,20 @@ class ConversionBody extends StatelessWidget {
   String get input => file.path!;
   int get lastDotPos => file.name.lastIndexOf('.');
   String get outputPath => outputDir + file.name.substring(0, lastDotPos);
-  String get extension => '.wav';
-  String get output => outputPath + extension;
+  String get output => '$outputPath.$format';
 
   void _convertFiles(BuildContext context) async {
-    Dialogs.showProcessingDialog(context);
+    Utilities.showProcessingDialog(context);
 
-    FFmpegKit.executeWithArgumentsAsync(["-i", input, output], (session) async {
+    List<String> cmd = ['-i'];
+    cmd.add(input);
+    if (preserveMetadata) {
+      cmd.add('-map_metadata');
+      cmd.add('0:s:0');
+    }
+    cmd.add(output);
+
+    FFmpegKit.executeWithArgumentsAsync(cmd, (session) async {
       final returnCode = await session.getReturnCode();
       if (!context.mounted) return;
 
@@ -54,13 +64,9 @@ class ConversionBody extends StatelessWidget {
           }),
         );
       } else if (ReturnCode.isCancel(returnCode)) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Operation Cancelled!'),
-        ));
+        Utilities.showSnackBar(context, 'Operation Cancelled!');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Operation Failed!'),
-        ));
+        Utilities.showSnackBar(context, 'Operation Failed!');
       }
     });
   }
@@ -71,7 +77,7 @@ class ConversionBody extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       spacing: 40,
       children: [
-        Placeholder(),
+        ConversionOptions(),
         Center(
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -80,7 +86,7 @@ class ConversionBody extends StatelessWidget {
                 onPressed: () => _convertFiles(context),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Text(
+                  child: const Text(
                     'Convert',
                     style: TextStyle(
                       fontSize: 32,
@@ -93,6 +99,74 @@ class ConversionBody extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class ConversionOptions extends StatelessWidget {
+  const ConversionOptions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const FormatDropdown(),
+        const MetadataCheckbox(),
+        const Placeholder(),
+      ],
+    );
+  }
+}
+
+class FormatDropdown extends StatefulWidget {
+  const FormatDropdown({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _FormatDropdownState();
+}
+
+class _FormatDropdownState extends State<FormatDropdown> {
+  final formats = ['mp3', 'aac', 'wav', 'ogg', 'm4a', 'wma', 'aif', 'flac', 'mp2', 'ac3', 'ra', 'au', 'tta', 'caf', 'adts', 'wv', 'aifc'];
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton(
+      value: format,
+      elevation: 16,
+      underline: Container(height: 2),
+      onChanged: (String? value) {
+        setState(() {
+          format = value!;
+        });
+      },
+      items: formats.map((String value) {
+        return DropdownMenuItem(
+          value: value,
+          child: Text(value.toUpperCase()),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class MetadataCheckbox extends StatefulWidget {
+  const MetadataCheckbox({super.key});
+
+  @override
+  State<MetadataCheckbox> createState() => _MetadataCheckboxState();
+}
+
+class _MetadataCheckboxState extends State<MetadataCheckbox> {
+  @override
+  Widget build(BuildContext context) {
+    return CheckboxListTile(
+      title: const Text('Preserve Metadata(experimental)'),
+      value: preserveMetadata,
+      onChanged: (bool? value) {
+        setState(() {
+          preserveMetadata = value!;
+        });
+      },
     );
   }
 }

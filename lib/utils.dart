@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class Dialogs {
+class Utilities {
   static Future<void> showProcessingDialog(BuildContext context) async {
     final SimpleDialog dialog = SimpleDialog(
-      backgroundColor: Colors.black12,
+      backgroundColor: Colors.white70,
       children: [
         Center(
           child: Column(
@@ -13,9 +13,6 @@ class Dialogs {
               SizedBox(height: 10),
               Text(
                 "Processing...",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
               ),
             ],
           ),
@@ -31,5 +28,11 @@ class Dialogs {
         return PopScope(child: dialog);
       },
     );
+  }
+
+  static void showSnackBar(BuildContext context, String text) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(text),
+    ));
   }
 }

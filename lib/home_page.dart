@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:shravya_parivartak/utils.dart';
 
 import 'conversion_page.dart';
 
@@ -26,19 +27,18 @@ class HomePageBody extends StatelessWidget {
 
   // Handles file selection and routing
   Future<void> _handleFileSelection(BuildContext context) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
     // Check if widget is still mounted
     if (!context.mounted) return;
 
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
     // When file is not selected
     if (result == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Try Again!'),
-      ));
+      Utilities.showSnackBar(context, 'Try Again');
       return;
     }
 
+    // Get the first file
     file = result.files.first;
 
     // Route to next page
@@ -58,7 +58,7 @@ class HomePageBody extends StatelessWidget {
         children: [
           Text(
             'Select files to convert',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w300,
             ),
@@ -69,7 +69,7 @@ class HomePageBody extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Text(
                 'Select',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w400,
                 ),
