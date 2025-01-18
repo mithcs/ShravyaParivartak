@@ -30,33 +30,39 @@ class ConversionBody extends StatelessWidget {
   final PlatformFile file;
   final String outputDir = '/sdcard/Download/';
 
-  String? get inputPath => file.path;
+  String get input => file.path!;
   int get lastDotPos => file.name.lastIndexOf('.');
-  String? get outputPath => outputDir + file.name.substring(0, lastDotPos);
+  String get outputPath => outputDir + file.name.substring(0, lastDotPos);
+  String get extension => '.wav';
+  String get output => outputPath + extension;
 
-  void _convertFiles(BuildContext context) {
-    // Execute ffmpeg command
-    FFmpegKit.execute('-i $inputPath $outputPath.wav').then((session) async {
+  void _convertFiles(BuildContext context) async {
+    Dialogs.showProcessingDialog(context);
+
+    FFmpegKit.executeWithArgumentsAsync(["-i", input, output], (session) async {
       final returnCode = await session.getReturnCode();
+      if (!context.mounted) return;
 
+      Navigator.of(context).pop();
+
+      // Verify return code
       if (ReturnCode.isSuccess(returnCode)) {
-        // SUCCESS
-        // ...
+        // Route to next page
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) {
+            return FinishedPage();
+          }),
+        );
       } else if (ReturnCode.isCancel(returnCode)) {
-        // CANCEL
-        // ...
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Operation Cancelled!'),
+        ));
       } else {
-        // ERROR
-        // ...
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Operation Failed!'),
+        ));
       }
     });
-
-    // Route to next page
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) {
-        return FinishedPage();
-      }),
-    );
   }
 
   @override

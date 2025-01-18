@@ -22,14 +22,14 @@ class HomePage extends StatelessWidget {
 class HomePageBody extends StatelessWidget {
   HomePageBody({super.key});
 
-  late final PlatformFile file;
+  late PlatformFile file;
 
   // Handles file selection and routing
   Future<void> _handleFileSelection(BuildContext context) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
     // Check if widget is still mounted
     if (!context.mounted) return;
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     // When file is not selected
     if (result == null) {
