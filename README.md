@@ -1,4 +1,4 @@
-# shravya_parivartak
+# Shravya Parivartak
 
 
 `...` denotes incomplete/partial code

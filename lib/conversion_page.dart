@@ -5,6 +5,7 @@ import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 
 import 'finished_page.dart';
+import 'utils.dart';
 
 /// Conversion page
 class ConversionPage extends StatelessWidget {

@@ -25,7 +25,7 @@ class HomePageBody extends StatelessWidget {
   late final PlatformFile file;
 
   // Handles file selection and routing
-  void _handleFileSelection(BuildContext context) async {
+  Future<void> _handleFileSelection(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     // Check if widget is still mounted
