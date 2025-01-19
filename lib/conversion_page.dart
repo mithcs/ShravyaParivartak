@@ -42,11 +42,15 @@ class ConversionBody extends StatelessWidget {
     Utilities.showProcessingDialog(context);
 
     List<String> cmd = ['-i'];
+
     cmd.add(input);
     if (preserveMetadata) {
       cmd.add('-map_metadata');
-      cmd.add('0:s:0');
+      cmd.add('0');
     }
+
+    cmd.add('-map');
+    cmd.add('0');
     cmd.add(output);
 
     FFmpegKit.executeWithArgumentsAsync(cmd, (session) async {
