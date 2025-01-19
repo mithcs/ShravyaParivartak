@@ -5,4 +5,5 @@
 
 
 ### TODO:
-[ ] Update code to use [Flutter Platform Widgets](https://github.com/stryder-dev/flutter_platform_widgets)
+[ ] Update code to use [Flutter Platform Widgets](https://github.com/stryder-dev/flutter_platform_widgets).
+[ ] Add `dispose()` methods whenever they should be added.
