@@ -12,8 +12,9 @@ bool preserveMetadata = false;
 
 /// Conversion page
 class ConversionPage extends StatelessWidget {
-  const ConversionPage({super.key, required this.file});
-  final PlatformFile file;
+  const ConversionPage({super.key, required this.files, required this.filesCount});
+  final List<PlatformFile> files;
+  final int filesCount;
 
   @override
   Widget build(BuildContext context) {
@@ -21,37 +22,45 @@ class ConversionPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Convert Files'),
       ),
-      body: ConversionBody(file: file),
+      body: ConversionBody(files: files, filesCount: filesCount),
     );
   }
 }
 
 /// Body of conversion page
 class ConversionBody extends StatelessWidget {
-  const ConversionBody({super.key, required this.file});
+  const ConversionBody({super.key, required this.files, required this.filesCount});
 
-  final PlatformFile file;
+  final List<PlatformFile> files;
+  final int filesCount;
   final String outputDir = '/sdcard/Download/';
-
-  String get input => file.path!;
-  int get lastDotPos => file.name.lastIndexOf('.');
-  String get outputPath => outputDir + file.name.substring(0, lastDotPos);
-  String get output => '$outputPath.$format';
 
   void _convertFiles(BuildContext context) async {
     Utilities.showProcessingDialog(context);
 
-    List<String> cmd = ['-i'];
+    List<String> cmd = [];
+    List<String> inputs = [];
+    List<String> outputs = [];
 
-    cmd.add(input);
-    if (preserveMetadata) {
-      cmd.add('-map_metadata');
-      cmd.add('0');
+    for (int i = 0; i < filesCount; ++i) {
+      int lastDotPos = files[i].name.lastIndexOf('.');
+      String outputPath = outputDir + files[i].name.substring(0, lastDotPos);
+
+      inputs.add('-i');
+      inputs.add(files[i].path!);
+
+      if (preserveMetadata) {
+        outputs.add('-map_metadata');
+        outputs.add(i.toString());
+      }
+
+      outputs.add('-map');
+      outputs.add(i.toString());
+      outputs.add('$outputPath.$format');
     }
 
-    cmd.add('-map');
-    cmd.add('0');
-    cmd.add(output);
+    cmd.addAll(inputs);
+    cmd.addAll(outputs);
 
     FFmpegKit.executeWithArgumentsAsync(cmd, (session) async {
       final returnCode = await session.getReturnCode();
