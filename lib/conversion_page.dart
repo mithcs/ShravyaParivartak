@@ -126,7 +126,7 @@ class FormatDropdown extends StatefulWidget {
 }
 
 class _FormatDropdownState extends State<FormatDropdown> {
-  final formats = ['mp3', 'aac', 'wav', 'ogg', 'm4a', 'wma', 'aif', 'flac', 'mp2', 'ac3', 'ra', 'au', 'tta', 'caf', 'adts', 'wv', 'aifc'];
+  final formats = ['aac', 'ac3', 'adts', 'aif', 'aifc', 'au', 'caf', 'flac', 'm4a', 'mp2', 'mp3', 'ogg', 'ra', 'tta', 'wav', 'wma', 'wv'];
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +160,7 @@ class _MetadataCheckboxState extends State<MetadataCheckbox> {
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
-      title: const Text('Preserve Metadata(experimental)'),
+      title: const Text('Preserve Metadata'),
       value: preserveMetadata,
       onChanged: (bool? value) {
         setState(() {

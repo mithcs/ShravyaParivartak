@@ -21,9 +21,7 @@ class HomePage extends StatelessWidget {
 
 /// Body of home page
 class HomePageBody extends StatelessWidget {
-  HomePageBody({super.key});
-
-  late PlatformFile file;
+  const HomePageBody({super.key});
 
   // Handles file selection and routing
   Future<void> _handleFileSelection(BuildContext context) async {
@@ -39,7 +37,7 @@ class HomePageBody extends StatelessWidget {
     }
 
     // Get the first file
-    file = result.files.first;
+    PlatformFile file = result.files.first;
 
     // Route to next page
     Navigator.of(context).push(
