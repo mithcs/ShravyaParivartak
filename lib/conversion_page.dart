@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
+import 'package:ffmpeg_kit_flutter_audio/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
 
 import 'finished_page.dart';
 import 'utils.dart';
@@ -139,14 +139,17 @@ class FormatDropdown extends StatefulWidget {
 }
 
 class _FormatDropdownState extends State<FormatDropdown> {
-  final formats = ['aac', 'ac3', 'adts', 'aif', 'aifc', 'au', 'caf', 'flac', 'm4a', 'mp2', 'mp3', 'ogg', 'ra', 'tta', 'wav', 'wma', 'wv'];
+  final formats = ['aac', 'ac3', 'adts', 'aif', 'aifc', 'au', 'caf', 'flac', 'm4a', 'mp2', 'mp3', 'ogg', 'opus', 'ra', 'tta', 'wav', 'wma', 'wv'];
 
   @override
   Widget build(BuildContext context) {
     return DropdownButton(
       value: format,
       elevation: 16,
-      underline: Container(height: 2),
+      underline: Container(
+        height: 2,
+        color: Theme.of(context).colorScheme.primary
+      ),
       onChanged: (String? value) {
         setState(() {
           format = value!;
@@ -155,7 +158,7 @@ class _FormatDropdownState extends State<FormatDropdown> {
       items: formats.map((String value) {
         return DropdownMenuItem(
           value: value,
-          child: Text(value.toUpperCase()),
+          child: Text(' ' + value.toUpperCase()),
         );
       }).toList(),
     );
