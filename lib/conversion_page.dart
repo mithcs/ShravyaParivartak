@@ -116,6 +116,7 @@ class ConversionBody extends StatelessWidget {
   }
 }
 
+/// Parent class for conversion options
 class ConversionOptions extends StatelessWidget {
   const ConversionOptions({super.key});
 
@@ -130,6 +131,7 @@ class ConversionOptions extends StatelessWidget {
   }
 }
 
+/// Dropdown to select output format
 class FormatDropdown extends StatefulWidget {
   const FormatDropdown({super.key});
 
@@ -137,6 +139,7 @@ class FormatDropdown extends StatefulWidget {
   State<StatefulWidget> createState() => _FormatDropdownState();
 }
 
+/// [STATE] Dropdown to select output format
 class _FormatDropdownState extends State<FormatDropdown> {
   final formats = ['aac', 'ac3', 'adts', 'aif', 'aifc', 'au', 'caf', 'flac', 'm4a', 'mp2', 'mp3', 'ogg', 'opus', 'ra', 'tta', 'wav', 'wma', 'wv'];
 
@@ -174,6 +177,7 @@ class _FormatDropdownState extends State<FormatDropdown> {
   }
 }
 
+/// Checkbox to decide whether to preserve metadata or not
 class MetadataCheckbox extends StatefulWidget {
   const MetadataCheckbox({super.key});
 
@@ -181,6 +185,7 @@ class MetadataCheckbox extends StatefulWidget {
   State<MetadataCheckbox> createState() => _MetadataCheckboxState();
 }
 
+/// [STATE] Checkbox to decide whether to preserve metadata or not
 class _MetadataCheckboxState extends State<MetadataCheckbox> {
   @override
   Widget build(BuildContext context) {
