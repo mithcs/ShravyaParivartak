@@ -122,11 +122,10 @@ class ConversionOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        const FormatDropdown(),
-        const MetadataCheckbox(),
-        const Placeholder(),
-      ],
+        children: [
+          const FormatDropdown(),
+          const MetadataCheckbox(),
+        ],
     );
   }
 }
@@ -143,24 +142,34 @@ class _FormatDropdownState extends State<FormatDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton(
-      value: format,
-      elevation: 16,
-      underline: Container(
-        height: 2,
-        color: Theme.of(context).colorScheme.primary
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        spacing: 36,
+        children: [
+          Text('Output Format', style: TextStyle(fontSize: 18)),
+          DropdownButton(
+            value: format,
+            elevation: 16,
+            underline: Container(
+              height: 2,
+              color: Theme.of(context).colorScheme.primary
+            ),
+            onChanged: (String? value) {
+              setState(() {
+                format = value!;
+              });
+            },
+            items: formats.map((String value) {
+              return DropdownMenuItem(
+                value: value,
+                child: Text(' $value'.toUpperCase()),
+              );
+            }).toList(),
+          ),
+        ],
       ),
-      onChanged: (String? value) {
-        setState(() {
-          format = value!;
-        });
-      },
-      items: formats.map((String value) {
-        return DropdownMenuItem(
-          value: value,
-          child: Text(' ' + value.toUpperCase()),
-        );
-      }).toList(),
     );
   }
 }
@@ -176,7 +185,7 @@ class _MetadataCheckboxState extends State<MetadataCheckbox> {
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
-      title: const Text('Preserve Metadata'),
+      title: const Text('Preserve Metadata', style: TextStyle(fontSize: 18)),
       value: preserveMetadata,
       onChanged: (bool? value) {
         setState(() {
