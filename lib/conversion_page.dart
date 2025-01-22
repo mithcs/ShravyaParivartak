@@ -7,9 +7,12 @@ import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
 import 'finished_page.dart';
 import 'utils.dart';
 
-String format = 'mp3';
-bool preserveMetadata = true;
-bool deleteMetadata = false;
+enum AudioChannel { unchanged, mono, stereo }
+
+String _format = 'mp3';
+bool _preserveMetadata = true;
+bool _deleteMetadata = false;
+AudioChannel _audioChannel = AudioChannel.unchanged;
 
 /// Conversion page
 class ConversionPage extends StatelessWidget {
@@ -44,24 +47,32 @@ class ConversionBody extends StatelessWidget {
     List<String> outputs = [];
 
     for (int i = 0; i < filesCount; ++i) {
-      int lastDotPos = files[i].name.lastIndexOf('.');
-      String outputPath = outputDir + files[i].name.substring(0, lastDotPos);
+    int lastDotPos = files[i].name.lastIndexOf('.');
+    String outputPath = outputDir + files[i].name.substring(0, lastDotPos);
 
-      inputs.add('-i');
-      inputs.add(files[i].path!);
+    inputs.add('-i');
+    inputs.add(files[i].path!);
 
-      if (preserveMetadata) {
+    if (_preserveMetadata) {
         outputs.add('-map_metadata');
         outputs.add(i.toString());
-      } else if (deleteMetadata) {
+      } else if (_deleteMetadata) {
         outputs.add('-map_metadata');
         outputs.add('-1');
       }
 
-      outputs.add('-map');
-      outputs.add(i.toString());
-      outputs.add('$outputPath.$format');
-    }
+    if (_audioChannel == AudioChannel.mono) {
+        outputs.add('-ac');
+        outputs.add('1');
+      } else if (_audioChannel == AudioChannel.stereo) {
+        outputs.add('-ac');
+        outputs.add('2');
+      }
+
+    outputs.add('-map');
+    outputs.add(i.toString());
+    outputs.add('$outputPath.$_format');
+  }
 
     cmd.addAll(inputs);
     cmd.addAll(outputs);
@@ -128,11 +139,37 @@ class ConversionOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SectionTitle(title: 'General Options'),
         const FormatDropdown(),
+
+        const SectionTitle(title: 'Metadata'),
         const PreserveMetadataCheckbox(),
         const DeleteMetadataCheckbox(),
+
+        const SectionTitle(title: 'Audio Channel'),
+        const AudioChannelRadioButton(),
       ],
     );
+  }
+}
+
+/// Title to categorize options
+class SectionTitle extends StatelessWidget {
+  const SectionTitle({super.key, required this.title});
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+        )
+      )
+    ); 
   }
 }
 
@@ -158,7 +195,7 @@ class _FormatDropdownState extends State<FormatDropdown> {
         children: [
           Text('Output Format', style: TextStyle(fontSize: 18)),
           DropdownButton(
-            value: format,
+            value: _format,
             elevation: 16,
             underline: Container(
               height: 2,
@@ -166,7 +203,7 @@ class _FormatDropdownState extends State<FormatDropdown> {
             ),
             onChanged: (String? value) {
               setState(() {
-                format = value!;
+                _format = value!;
               });
             },
             items: formats.map((String value) {
@@ -196,14 +233,14 @@ class _PreserveMetadataCheckboxState extends State<PreserveMetadataCheckbox> {
   Widget build(BuildContext context) {
     return CheckboxListTile(
       title: const Text('Preserve Metadata', style: TextStyle(fontSize: 18)),
-      value: preserveMetadata,
+      value: _preserveMetadata,
       onChanged: (bool? value) {
         setState(() {
           // really wanted to do this in 2 lines
-          if (value! && deleteMetadata) {
+          if (value! && _deleteMetadata) {
             Utilities.showSnackBar(context, 'Uncheck Delete Metadata first!');
           } else {
-            preserveMetadata = value;
+            _preserveMetadata = value;
           }
         });
       },
@@ -225,16 +262,70 @@ class _DeleteMetadataCheckboxState extends State<DeleteMetadataCheckbox> {
   Widget build(BuildContext build) {
     return CheckboxListTile(
       title: const Text('Delete Metadata', style: TextStyle(fontSize: 18)),
-      value: deleteMetadata,
+      value: _deleteMetadata,
       onChanged: (bool? value) {
         setState(() {
-          if (value! && preserveMetadata) {
+          if (value! && _preserveMetadata) {
             Utilities.showSnackBar(context, 'Uncheck Preserve Metadata first!');
           } else {
-            deleteMetadata = value;
+            _deleteMetadata = value;
           }
         });
       },
+    );
+  }
+}
+
+/// Radiobutton to decide audio channel: Default/Mono/Stereo
+class AudioChannelRadioButton extends StatefulWidget {
+  const AudioChannelRadioButton({super.key});
+
+  @override
+  State<AudioChannelRadioButton> createState() => _AudioChannelRadioButtonState();
+}
+
+/// [STATE] Radiobutton to decide audio channel: Default/Mono/Stereo
+class _AudioChannelRadioButtonState extends State<AudioChannelRadioButton> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Radio(
+              value: AudioChannel.unchanged,
+              groupValue: _audioChannel,
+              onChanged: (AudioChannel? value) {
+                setState(() {
+                  _audioChannel = value!;
+                });
+              },
+            ),
+            Text('Unchanged', style: TextStyle(fontSize: 18)),
+            Radio(
+              value: AudioChannel.mono,
+              groupValue: _audioChannel,
+              onChanged: (AudioChannel? value) {
+                setState(() {
+                  _audioChannel = value!;
+                });
+              },
+            ),
+            Text('Mono', style: TextStyle(fontSize: 18)),
+            Radio(
+              value: AudioChannel.stereo,
+              groupValue: _audioChannel,
+              onChanged: (AudioChannel? value) {
+                setState(() {
+                  _audioChannel = value!;
+                });
+              },
+            ),
+            Text('Stereo', style: TextStyle(fontSize: 18)),
+          ],
+        ),
+      ],
     );
   }
 }
