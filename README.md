@@ -5,6 +5,7 @@
 
 
 ### TODO:
+- [ ] Update Metadata section to use RadioButton instead of Checkbox
 - [ ] Update code to use [Flutter Platform Widgets](https://github.com/stryder-dev/flutter_platform_widgets).
 - [ ] Add `dispose()` methods whenever they should be added.
 - [ ] Add option to control `bitrate` while format conversion
