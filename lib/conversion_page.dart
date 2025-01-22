@@ -8,7 +8,8 @@ import 'finished_page.dart';
 import 'utils.dart';
 
 String format = 'mp3';
-bool preserveMetadata = false;
+bool preserveMetadata = true;
+bool deleteMetadata = false;
 
 /// Conversion page
 class ConversionPage extends StatelessWidget {
@@ -52,6 +53,9 @@ class ConversionBody extends StatelessWidget {
       if (preserveMetadata) {
         outputs.add('-map_metadata');
         outputs.add(i.toString());
+      } else if (deleteMetadata) {
+        outputs.add('-map_metadata');
+        outputs.add('-1');
       }
 
       outputs.add('-map');
@@ -123,10 +127,11 @@ class ConversionOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-        children: [
-          const FormatDropdown(),
-          const MetadataCheckbox(),
-        ],
+      children: [
+        const FormatDropdown(),
+        const PreserveMetadataCheckbox(),
+        const DeleteMetadataCheckbox(),
+      ],
     );
   }
 }
@@ -177,16 +182,16 @@ class _FormatDropdownState extends State<FormatDropdown> {
   }
 }
 
-/// Checkbox to decide whether to preserve metadata or not
-class MetadataCheckbox extends StatefulWidget {
-  const MetadataCheckbox({super.key});
+/// Checkbox to decide whether to try to preserve metadata or not
+class PreserveMetadataCheckbox extends StatefulWidget {
+  const PreserveMetadataCheckbox({super.key});
 
   @override
-  State<MetadataCheckbox> createState() => _MetadataCheckboxState();
+  State<PreserveMetadataCheckbox> createState() => _PreserveMetadataCheckboxState();
 }
 
-/// [STATE] Checkbox to decide whether to preserve metadata or not
-class _MetadataCheckboxState extends State<MetadataCheckbox> {
+/// [STATE] Checkbox to decide whether to try to preserve metadata or not
+class _PreserveMetadataCheckboxState extends State<PreserveMetadataCheckbox> {
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
@@ -194,7 +199,40 @@ class _MetadataCheckboxState extends State<MetadataCheckbox> {
       value: preserveMetadata,
       onChanged: (bool? value) {
         setState(() {
-          preserveMetadata = value!;
+          // really wanted to do this in 2 lines
+          if (value! && deleteMetadata) {
+            Utilities.showSnackBar(context, 'Uncheck Delete Metadata first!');
+          } else {
+            preserveMetadata = value;
+          }
+        });
+      },
+    );
+  }
+}
+
+/// Checkbox to decide whether to delete metadata or not
+class DeleteMetadataCheckbox extends StatefulWidget {
+  const DeleteMetadataCheckbox({super.key});
+
+  @override
+  State<DeleteMetadataCheckbox> createState() => _DeleteMetadataCheckboxState();
+}
+
+/// [STATE] Checkbox to decide whether to delete metadata or not
+class _DeleteMetadataCheckboxState extends State<DeleteMetadataCheckbox> {
+  @override
+  Widget build(BuildContext build) {
+    return CheckboxListTile(
+      title: const Text('Delete Metadata', style: TextStyle(fontSize: 18)),
+      value: deleteMetadata,
+      onChanged: (bool? value) {
+        setState(() {
+          if (value! && preserveMetadata) {
+            Utilities.showSnackBar(context, 'Uncheck Preserve Metadata first!');
+          } else {
+            deleteMetadata = value;
+          }
         });
       },
     );

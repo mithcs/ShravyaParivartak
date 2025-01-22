@@ -26,8 +26,6 @@ class HomePageBody extends StatelessWidget {
   // Handles file selection and routing
   Future<void> _handleFileSelection(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
-
-    // Check if widget is still mounted
     if (!context.mounted) return;
 
     // When file is not selected
@@ -36,11 +34,9 @@ class HomePageBody extends StatelessWidget {
       return;
     }
 
-    // Get files
     List<PlatformFile> files = result.files;
     int filesCount = result.files.length;
 
-    // Route to next page
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
         return ConversionPage(files: files, filesCount: filesCount);
