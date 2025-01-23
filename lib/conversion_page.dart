@@ -7,12 +7,15 @@ import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
 import 'finished_page.dart';
 import 'utils.dart';
 
+/// ...
+enum Metadata { preserve, delete }
+
+/// ...
 enum AudioChannel { unchanged, mono, stereo }
 
 String _format = 'mp3';
-bool _preserveMetadata = true;
-bool _deleteMetadata = false;
 AudioChannel _audioChannel = AudioChannel.unchanged;
+Metadata _metadata = Metadata.preserve;
 
 /// Conversion page
 class ConversionPage extends StatelessWidget {
@@ -53,10 +56,10 @@ class ConversionBody extends StatelessWidget {
     inputs.add('-i');
     inputs.add(files[i].path!);
 
-    if (_preserveMetadata) {
+    if (_metadata == Metadata.preserve) {
         outputs.add('-map_metadata');
         outputs.add(i.toString());
-      } else if (_deleteMetadata) {
+      } else if (_metadata == Metadata.delete) {
         outputs.add('-map_metadata');
         outputs.add('-1');
       }
@@ -143,8 +146,7 @@ class ConversionOptions extends StatelessWidget {
         const FormatDropdown(),
 
         const SectionTitle(title: 'Metadata'),
-        const PreserveMetadataCheckbox(),
-        const DeleteMetadataCheckbox(),
+        const MetadataRadioButton(),
 
         const SectionTitle(title: 'Audio Channel'),
         const AudioChannelRadioButton(),
@@ -219,59 +221,41 @@ class _FormatDropdownState extends State<FormatDropdown> {
   }
 }
 
-/// Checkbox to decide whether to try to preserve metadata or not
-class PreserveMetadataCheckbox extends StatefulWidget {
-  const PreserveMetadataCheckbox({super.key});
+/// Radiobutton to decide whether to preserve or delete metadata
+class MetadataRadioButton extends StatefulWidget {
+  const MetadataRadioButton({super.key});
 
   @override
-  State<PreserveMetadataCheckbox> createState() => _PreserveMetadataCheckboxState();
+  State<MetadataRadioButton> createState() => _MetadataRadioButtonState();
 }
 
-/// [STATE] Checkbox to decide whether to try to preserve metadata or not
-class _PreserveMetadataCheckboxState extends State<PreserveMetadataCheckbox> {
+/// [STATE] Radiobutton to decide whether to preserve or delete metadata
+class _MetadataRadioButtonState extends State<MetadataRadioButton> {
   @override
   Widget build(BuildContext context) {
-    return CheckboxListTile(
-      title: const Text('Preserve Metadata', style: TextStyle(fontSize: 18)),
-      value: _preserveMetadata,
-      onChanged: (bool? value) {
-        setState(() {
-          // really wanted to do this in 2 lines
-          if (value! && _deleteMetadata) {
-            Utilities.showSnackBar(context, 'Uncheck Delete Metadata first!');
-          } else {
-            _preserveMetadata = value;
-          }
-        });
-      },
-    );
-  }
-}
-
-/// Checkbox to decide whether to delete metadata or not
-class DeleteMetadataCheckbox extends StatefulWidget {
-  const DeleteMetadataCheckbox({super.key});
-
-  @override
-  State<DeleteMetadataCheckbox> createState() => _DeleteMetadataCheckboxState();
-}
-
-/// [STATE] Checkbox to decide whether to delete metadata or not
-class _DeleteMetadataCheckboxState extends State<DeleteMetadataCheckbox> {
-  @override
-  Widget build(BuildContext build) {
-    return CheckboxListTile(
-      title: const Text('Delete Metadata', style: TextStyle(fontSize: 18)),
-      value: _deleteMetadata,
-      onChanged: (bool? value) {
-        setState(() {
-          if (value! && _preserveMetadata) {
-            Utilities.showSnackBar(context, 'Uncheck Preserve Metadata first!');
-          } else {
-            _deleteMetadata = value;
-          }
-        });
-      },
+    return Column(
+      children: [
+        RadioListTile(
+          title: Text('Preserve Metadata'),
+          value: Metadata.preserve,
+          groupValue: _metadata,
+          onChanged: (Metadata? value) {
+            setState(() {
+              _metadata = value!;
+            });
+          },
+        ),
+        RadioListTile(
+          title: Text('Delete Metadata'),
+          value: Metadata.delete,
+          groupValue: _metadata,
+          onChanged: (Metadata? value) {
+            setState(() {
+              _metadata = value!;
+            });
+          },
+        ),
+      ],
     );
   }
 }
