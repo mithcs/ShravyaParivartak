@@ -7,19 +7,27 @@ import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
 import 'finished_page.dart';
 import 'utils.dart';
 
-/// ...
+/// Enum representing metadata handling options
+/// - [preserve]: Preserve all the existing metadata
+/// - [delete]: Removes all metadata
 enum Metadata { preserve, delete }
 
-/// ...
+/// Enum representing available audio channel options
+/// - [unchanged]: Keep the audio channel as it is
+/// - [mono]: Convert the audio to mono
+/// - [stereo]: Convert the audio to stereo
 enum AudioChannel { unchanged, mono, stereo }
 
+int _samplingRate = -1;
 String _format = 'mp3';
 AudioChannel _audioChannel = AudioChannel.unchanged;
 Metadata _metadata = Metadata.preserve;
 
 /// Conversion page
 class ConversionPage extends StatelessWidget {
-  const ConversionPage({super.key, required this.files, required this.filesCount});
+  const ConversionPage(
+      {super.key, required this.files, required this.filesCount}
+  );
   final List<PlatformFile> files;
   final int filesCount;
 
@@ -36,7 +44,9 @@ class ConversionPage extends StatelessWidget {
 
 /// Body of conversion page
 class ConversionBody extends StatelessWidget {
-  const ConversionBody({super.key, required this.files, required this.filesCount});
+  const ConversionBody(
+      {super.key, required this.files, required this.filesCount}
+  );
 
   final List<PlatformFile> files;
   final int filesCount;
@@ -50,21 +60,14 @@ class ConversionBody extends StatelessWidget {
     List<String> outputs = [];
 
     for (int i = 0; i < filesCount; ++i) {
-    int lastDotPos = files[i].name.lastIndexOf('.');
-    String outputPath = outputDir + files[i].name.substring(0, lastDotPos);
+      int lastDotPos = files[i].name.lastIndexOf('.');
+      String outputPath = outputDir + files[i].name.substring(0, lastDotPos);
 
-    inputs.add('-i');
-    inputs.add(files[i].path!);
+      inputs.add('-i');
+      inputs.add(files[i].path!);
 
-    if (_metadata == Metadata.preserve) {
-        outputs.add('-map_metadata');
-        outputs.add(i.toString());
-      } else if (_metadata == Metadata.delete) {
-        outputs.add('-map_metadata');
-        outputs.add('-1');
-      }
-
-    if (_audioChannel == AudioChannel.mono) {
+      // Audio Channel
+      if (_audioChannel == AudioChannel.mono) {
         outputs.add('-ac');
         outputs.add('1');
       } else if (_audioChannel == AudioChannel.stereo) {
@@ -72,14 +75,31 @@ class ConversionBody extends StatelessWidget {
         outputs.add('2');
       }
 
-    outputs.add('-map');
-    outputs.add(i.toString());
-    outputs.add('$outputPath.$_format');
-  }
+      // Sampling Rate
+      if (_samplingRate != -1) {
+        outputs.add('-ar');
+        outputs.add(_samplingRate.toString());
+      }
+
+      // Metadata Option
+      if (_metadata == Metadata.preserve) {
+        outputs.add('-map_metadata');
+        outputs.add(i.toString());
+      } else if (_metadata == Metadata.delete) {
+        outputs.add('-map_metadata');
+        outputs.add('-1');
+      }
+
+      // Map files
+      outputs.add('-map');
+      outputs.add(i.toString());
+      outputs.add('$outputPath.$_format');
+    }
 
     cmd.addAll(inputs);
     cmd.addAll(outputs);
 
+    print(cmd);
     FFmpegKit.executeWithArgumentsAsync(cmd, (session) async {
       final returnCode = await session.getReturnCode();
       if (!context.mounted) return;
@@ -96,6 +116,7 @@ class ConversionBody extends StatelessWidget {
         );
       } else if (ReturnCode.isCancel(returnCode)) {
         Utilities.showSnackBar(context, 'Operation Cancelled!');
+        print(ReturnCode);
       } else {
         Utilities.showSnackBar(context, 'Operation Failed!');
       }
@@ -144,10 +165,9 @@ class ConversionOptions extends StatelessWidget {
       children: [
         const SectionTitle(title: 'General Options'),
         const FormatDropdown(),
-
+        const SamplingRateDropdown(),
         const SectionTitle(title: 'Metadata'),
         const MetadataRadioButton(),
-
         const SectionTitle(title: 'Audio Channel'),
         const AudioChannelRadioButton(),
       ],
@@ -163,15 +183,12 @@ class SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-        )
-      )
-    ); 
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text(title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            )));
   }
 }
 
@@ -185,7 +202,26 @@ class FormatDropdown extends StatefulWidget {
 
 /// [STATE] Dropdown to select output format
 class _FormatDropdownState extends State<FormatDropdown> {
-  final formats = ['aac', 'ac3', 'adts', 'aif', 'aifc', 'au', 'caf', 'flac', 'm4a', 'mp2', 'mp3', 'ogg', 'opus', 'ra', 'tta', 'wav', 'wma', 'wv'];
+  final formats = [
+    'aac',
+    'ac3',
+    'adts',
+    'aif',
+    'aifc',
+    'au',
+    'caf',
+    'flac',
+    'm4a',
+    'mp2',
+    'mp3',
+    'ogg',
+    'opus',
+    'ra',
+    'tta',
+    'wav',
+    'wma',
+    'wv'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -200,9 +236,7 @@ class _FormatDropdownState extends State<FormatDropdown> {
             value: _format,
             elevation: 16,
             underline: Container(
-              height: 2,
-              color: Theme.of(context).colorScheme.primary
-            ),
+                height: 2, color: Theme.of(context).colorScheme.primary),
             onChanged: (String? value) {
               setState(() {
                 _format = value!;
@@ -310,6 +344,64 @@ class _AudioChannelRadioButtonState extends State<AudioChannelRadioButton> {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// Dropdown to select sampling rate
+class SamplingRateDropdown extends StatefulWidget {
+  const SamplingRateDropdown({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _SamplingRateDropDownState();
+}
+
+class _SamplingRateDropDownState extends State<SamplingRateDropdown> {
+  /// Set of commonly used audio sampling rates (in Hz)
+  final Set<int> samplingRates = {
+    -1,
+    8000,
+    16000,
+    22000,
+    32000,
+    44100,
+    48000,
+    64000,
+    88200,
+    96000,
+    128000,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        spacing: 36,
+        children: [
+          Text('Sampling Rate', style: TextStyle(fontSize: 18)),
+          DropdownButton(
+            value: _samplingRate,
+            elevation: 16,
+            underline: Container(
+              height: 2,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onChanged: (int? value) {
+              setState(() {
+                _samplingRate = value!;
+              });
+            },
+            items: samplingRates.map((int value) {
+              return DropdownMenuItem(
+                value: value,
+                child: Text(value == -1 ? ' Unchanged' : ' ${value / 1000}k'),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }
