@@ -12,6 +12,7 @@ import 'utils.dart';
 /// - [delete]: Removes all metadata
 enum Metadata { preserve, delete }
 
+// TODO: Add more audio channels
 /// Enum representing available audio channel options
 /// - [unchanged]: Keep the audio channel as it is
 /// - [mono]: Convert the audio to mono
@@ -81,6 +82,11 @@ class ConversionBody extends StatelessWidget {
         outputs.add(_samplingRate.toString());
       }
 
+      // Map files
+      outputs.add('-map');
+      outputs.add(i.toString());
+      outputs.add('$outputPath.$_format');
+
       // Metadata Option
       if (_metadata == Metadata.preserve) {
         outputs.add('-map_metadata');
@@ -90,16 +96,15 @@ class ConversionBody extends StatelessWidget {
         outputs.add('-1');
       }
 
-      // Map files
-      outputs.add('-map');
-      outputs.add(i.toString());
-      outputs.add('$outputPath.$_format');
+      // TODO: Fix album art related issue
+      // Workound to eliminate failure on copying multiple files with one(or more)
+      // file(s) having album art
+      outputs.add('-vn');
     }
 
     cmd.addAll(inputs);
     cmd.addAll(outputs);
 
-    print(cmd);
     FFmpegKit.executeWithArgumentsAsync(cmd, (session) async {
       final returnCode = await session.getReturnCode();
       if (!context.mounted) return;
@@ -116,7 +121,6 @@ class ConversionBody extends StatelessWidget {
         );
       } else if (ReturnCode.isCancel(returnCode)) {
         Utilities.showSnackBar(context, 'Operation Cancelled!');
-        print(ReturnCode);
       } else {
         Utilities.showSnackBar(context, 'Operation Failed!');
       }
