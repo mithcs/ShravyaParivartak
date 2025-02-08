@@ -46,3 +46,25 @@ class _MetadataRadioButtonState extends State<MetadataRadioButton> {
     );
   }
 }
+
+class AlbumArtSelection extends StatefulWidget {
+  const AlbumArtSelection({super.key});
+
+  @override
+  State<AlbumArtSelection> createState() => _AlbumArtSelectionState();
+}
+
+class _AlbumArtSelectionState extends State<AlbumArtSelection> {
+  @override
+  Widget build(BuildContext context) {
+    return CheckboxListTile(
+      title: const Text('Delete Album Art'),
+      value: deleteAlbumArt,
+      onChanged: (bool? newValue) {
+        setState(() {
+          deleteAlbumArt = newValue!;
+        });
+      },
+    );
+  }
+}
