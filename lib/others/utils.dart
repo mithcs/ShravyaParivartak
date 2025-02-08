@@ -6,17 +6,15 @@ class Utilities {
     final SimpleDialog dialog = SimpleDialog(
       backgroundColor: Colors.white70,
       children: [
-        Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 10),
-              Text(
-                "Processing...",
-              ),
-            ],
-          ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 10),
+            Text(
+              "Processing...",
+            ),
+          ],
         ),
       ],
     );

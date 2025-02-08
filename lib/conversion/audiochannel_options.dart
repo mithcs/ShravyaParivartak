@@ -15,7 +15,7 @@ class AudioChannelRadioButton extends StatefulWidget {
 class _AudioChannelRadioButtonState extends State<AudioChannelRadioButton> {
   Widget _buildRadioButton(AudioChannel value, String label) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Radio(
           value: value,

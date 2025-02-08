@@ -33,6 +33,7 @@ class ConversionOptions extends StatelessWidget {
 }
 
 /// Function to do the actual conversion of files
+// TODO: clean this function
 Future<void> convertFiles(BuildContext context, int filesCount,
     List<PlatformFile> files, String outputDir) async {
   Utilities.showProcessingDialog(context);
@@ -88,6 +89,7 @@ Future<void> convertFiles(BuildContext context, int filesCount,
     final returnCode = await session.getReturnCode();
     if (!context.mounted) return;
 
+    FilePicker.platform.clearTemporaryFiles();
     Navigator.of(context).pop();
 
     // Verify return code
@@ -98,6 +100,7 @@ Future<void> convertFiles(BuildContext context, int filesCount,
           return FinishedPage();
         }),
       );
+
     } else if (ReturnCode.isCancel(returnCode)) {
       Utilities.showSnackBar(context, 'Operation Cancelled!');
     } else {

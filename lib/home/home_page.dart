@@ -25,7 +25,7 @@ class HomePageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         spacing: 40,
         children: [
           SelectText(),

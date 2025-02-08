@@ -33,7 +33,7 @@ class ConversionBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       spacing: 40,
       children: [
         ConversionOptions(),
@@ -59,9 +59,8 @@ class ConvertButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ElevatedButton(
             onPressed: () =>
@@ -78,7 +77,6 @@ class ConvertButton extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
+      );
   }
 }
