@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'definitions.dart';
 
-/// Radiobutton to decide audio channel: Default/Mono/Stereo
+/// Radiobutton to decide audio channel: Unchanged/Mono/Stereo
 class AudioChannelRadioButton extends StatefulWidget {
   const AudioChannelRadioButton({super.key});
 

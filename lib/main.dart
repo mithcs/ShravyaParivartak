@@ -20,14 +20,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-
         scaffoldBackgroundColor: theme.primaryContainer,
-
         appBarTheme: AppBarTheme(
           backgroundColor: theme.primary,
           foregroundColor: theme.onPrimary,
         ),
-
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             foregroundColor: WidgetStateProperty.all(theme.onPrimary),
@@ -39,4 +36,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

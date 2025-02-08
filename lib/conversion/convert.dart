@@ -24,6 +24,7 @@ class ConversionOptions extends StatelessWidget {
         const SamplingRateSelection(),
         const SectionTitle(title: 'Metadata'),
         const MetadataSelection(),
+        const AlbumArtSelection(),
         const SectionTitle(title: 'Audio Channel'),
         const AudioChannelRadioButton(),
       ],
@@ -32,7 +33,7 @@ class ConversionOptions extends StatelessWidget {
 }
 
 /// Function to do the actual conversion of files
-void convertFiles(BuildContext context, int filesCount,
+Future<void> convertFiles(BuildContext context, int filesCount,
     List<PlatformFile> files, String outputDir) async {
   Utilities.showProcessingDialog(context);
 
@@ -76,10 +77,8 @@ void convertFiles(BuildContext context, int filesCount,
       outputs.add('-1');
     }
 
-    // TODO: Fix album art related issue
-    // Workound to eliminate failure on copying multiple files with one(or more)
-    // file(s) having album art
-    outputs.add('-vn');
+    // Album Art option
+    if (deleteAlbumArt) outputs.add('-vn');
   }
 
   cmd.addAll(inputs);

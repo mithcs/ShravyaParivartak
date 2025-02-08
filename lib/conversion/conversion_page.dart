@@ -37,7 +37,8 @@ class ConversionBody extends StatelessWidget {
       spacing: 40,
       children: [
         ConversionOptions(),
-        ConvertButton(filesCount: filesCount, files: files, outputDir: outputDir),
+        ConvertButton(
+            filesCount: filesCount, files: files, outputDir: outputDir),
       ],
     );
   }
@@ -63,7 +64,8 @@ class ConvertButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ElevatedButton(
-            onPressed: () => convertFiles(context, filesCount, files, outputDir),
+            onPressed: () =>
+                convertFiles(context, filesCount, files, outputDir),
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: const Text(
@@ -80,4 +82,3 @@ class ConvertButton extends StatelessWidget {
     );
   }
 }
-
