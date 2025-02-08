@@ -1,4 +1,4 @@
-!["Shravya Parivartak"](icons/sp.svg) 
+!["Shravya Parivartak"](assets/sp.svg) 
 
 # श्रव्य परिवर्तक (Shravya Parivartak)
 
