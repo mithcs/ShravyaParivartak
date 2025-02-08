@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Utilities class
 class Utilities {
   static Future<void> showProcessingDialog(BuildContext context) async {
     final SimpleDialog dialog = SimpleDialog(
@@ -36,3 +37,4 @@ class Utilities {
     ));
   }
 }
+
