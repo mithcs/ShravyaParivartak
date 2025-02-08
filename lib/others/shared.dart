@@ -13,7 +13,6 @@ class SectionTitle extends StatelessWidget {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
-            )));    // blame lsp for this formatting
+            ))); // blame lsp for this formatting
   }
 }
-
